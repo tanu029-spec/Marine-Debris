@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large datasets / archives
+*.zip
+*.7z
+*.rar
+data/raw/
+data/processed/
+
+# ML model files
+*.pt
+*.pth
+*.onnx
+
+# Generated outputs
+runs/
+outputs/
+checkpoints/
+
+# Local database
+*.db
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

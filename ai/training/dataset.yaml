@@ -1,0 +1,9 @@
+path: C:\Users\tanis\Downloads
+train: train/images
+val: valid/images
+test: text/images
+names:
+  0: shipwreck_or_large_structure
+  1: debris_or_small_object
+  2: pipe_or_cable
+  3: natural_or_background_feature

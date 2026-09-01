@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy-900 text-gray-200 antialiased font-sans;
+  }
+  
+  /* Custom scrollbar for marine console feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-navy-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-navy-700 rounded;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-navy-600;
+  }
+}
+
+@layer components {
+  .console-card {
+    @apply bg-navy-800 border border-navy-700 rounded-md overflow-hidden;
+  }
+  
+  .console-btn {
+    @apply px-4 py-2 bg-navy-700 hover:bg-navy-600 text-cyan-400 font-medium rounded transition-colors duration-200 focus:outline-none focus:ring-1 focus:ring-cyan-500;
+  }
+  
+  .console-btn-primary {
+    @apply px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-navy-900;
+  }
+}
+
+/* Leaflet dark mode overrides */
+.leaflet-container {
+  background-color: #0a101f !important;
+}
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
