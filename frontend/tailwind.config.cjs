@@ -7,64 +7,42 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // HAVSANS Primary Backgrounds
-        marine: {
-          950: '#050E10',
-          900: '#071417',
-          850: '#091B1F',
-          800: '#0D2328',
-          750: '#0E2930',
-        },
-        // Secondary Surfaces
-        surface: {
-          900: '#102A30',
-          800: '#14353B',
-          700: '#183D43',
-          600: '#1E4A52',
-        },
-        // Ocean Blue
+        // Light Oceanic & Human Palette
         ocean: {
-          900: '#0B5263',
-          800: '#126579',
-          700: '#167A91',
-          600: '#1C93AF',
+          bg: '#F4FBFC',
+          surface: '#EAF7F8',
+          soft: '#D9F1F4',
+          light: '#8FD3DE',
+          medium: '#55B8C7',
+          accent: '#2D9FB2',
+          hover: '#248696',
+          dark: '#163F47',
+          muted: '#55777D',
+          border: '#C9E5E8',
+          card: '#FFFFFF',
         },
-        // Accent Cyan
-        cyan: {
-          300: '#63E3F0',
-          400: '#42D7E8',
-          500: '#26C6DA',
-          600: '#0EA5B7',
-          muted: '#8DBBC1',
-          dim: '#386B74',
-        },
-        // Text Colors
-        marineText: {
-          primary: '#F4F8F8',
-          secondary: '#A8BEC2',
-          muted: '#71898D',
-          dim: '#476266',
-        },
-        // Alert Accents
+        // Soft, Natural Alert Colors (Gentle coral, warm amber, soft sun yellow, sea blue)
         alert: {
-          critical: '#F87171', // soft red
-          high: '#FB923C',     // soft amber/orange
-          medium: '#FACC15',   // soft yellow
-          low: '#38BDF8',      // soft sky blue
-          success: '#34D399',  // emerald
+          critical: '#E06A60', // Soft coral red
+          high: '#E59846',     // Warm amber
+          medium: '#D4A017',   // Sunlit ochre
+          low: '#4FAEC0',      // Soft sea blue
+          success: '#38A882',  // Calm seafoam
         }
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
-      letterSpacing: {
-        widest: '.2em',
-        ultra: '.28em',
+      boxShadow: {
+        'soft': '0 2px 12px -2px rgba(22, 63, 71, 0.04), 0 1px 3px 0 rgba(22, 63, 71, 0.02)',
+        'card': '0 8px 24px -4px rgba(45, 159, 178, 0.08), 0 2px 6px -1px rgba(22, 63, 71, 0.03)',
+        'float': '0 16px 36px -8px rgba(45, 159, 178, 0.14), 0 4px 12px -2px rgba(22, 63, 71, 0.04)',
       },
-      borderColor: {
-        marine: 'rgba(141, 187, 193, 0.15)',
-        'marine-bright': 'rgba(66, 215, 232, 0.35)',
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.25rem',
+        '3xl': '1.75rem',
       }
     },
   },

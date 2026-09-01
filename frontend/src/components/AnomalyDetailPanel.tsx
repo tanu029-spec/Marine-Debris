@@ -3,12 +3,12 @@ import {
   CheckCircle2, 
   XCircle, 
   MapPin, 
-  Crosshair, 
   Ruler, 
   Layers, 
   Waves, 
-  Cpu, 
-  Activity
+  Search, 
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -58,17 +58,17 @@ const EvidenceBar = ({
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center justify-between text-[11px] font-mono">
-        <div className="flex items-center gap-1.5 text-marineText-secondary">
-          <Icon className="w-3 h-3 text-cyan-muted" />
+      <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center gap-1.5 text-ocean-dark font-medium">
+          <Icon className="w-3.5 h-3.5 text-ocean-accent" />
           <span>{label}</span>
-          <span className="text-[9px] text-marineText-dim">({weight})</span>
+          <span className="text-[10px] text-ocean-muted font-normal">({weight})</span>
         </div>
-        <span className="font-semibold text-marineText-primary">{percent}%</span>
+        <span className="font-semibold text-ocean-dark">{percent}%</span>
       </div>
-      <div className="h-1 bg-marine-950 rounded-full overflow-hidden flex">
+      <div className="h-2 bg-ocean-surface rounded-full overflow-hidden flex border border-ocean-border/40">
         <div 
-          className="h-full bg-gradient-to-r from-ocean-700 to-cyan-400 rounded-full transition-all duration-500 ease-out" 
+          className="h-full bg-gradient-to-r from-ocean-light to-ocean-accent rounded-full transition-all duration-500 ease-out" 
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -85,15 +85,15 @@ export const AnomalyDetailPanel: React.FC<AnomalyPanelProps> = ({
 }) => {
   if (!detection) {
     return (
-      <div className={cn("marine-card flex flex-col items-center justify-center p-8 text-center h-full", className)}>
-        <div className="w-12 h-12 rounded-full bg-surface-900/60 border border-white/[0.06] flex items-center justify-center mb-3 text-marineText-dim">
-          <Crosshair className="w-6 h-6 text-ocean-700" />
+      <div className={cn("ocean-card flex flex-col items-center justify-center p-8 text-center h-full", className)}>
+        <div className="w-14 h-14 rounded-2xl bg-ocean-soft/60 border border-ocean-border flex items-center justify-center mb-4 text-ocean-accent shadow-soft">
+          <Search className="w-6 h-6" />
         </div>
-        <div className="text-xs font-mono tracking-ultra text-marineText-secondary uppercase">
-          No Anomaly Selected
-        </div>
-        <p className="text-[11px] font-sans text-marineText-dim mt-2 max-w-[220px] leading-relaxed">
-          Select an acoustic bounding target in the sonar aperture to inspect evidence telemetry.
+        <h3 className="text-base font-semibold text-ocean-dark">
+          No Object Selected
+        </h3>
+        <p className="text-xs text-ocean-muted mt-2 max-w-[220px] leading-relaxed">
+          Click on an outlined object in the sonar feed to view its classification, dimensions, and evidence breakdown.
         </p>
       </div>
     );
@@ -102,15 +102,15 @@ export const AnomalyDetailPanel: React.FC<AnomalyPanelProps> = ({
   const getRiskBadge = (level: string) => {
     switch (level?.toUpperCase()) {
       case 'CRITICAL':
-        return { text: 'text-alert-critical', bg: 'bg-alert-critical/15 border-alert-critical/30', label: 'CRITICAL RISK' };
+        return { text: 'text-red-700', bg: 'bg-red-50 border-red-200', label: 'Critical Risk' };
       case 'HIGH':
-        return { text: 'text-alert-high', bg: 'bg-alert-high/15 border-alert-high/30', label: 'HIGH RISK' };
+        return { text: 'text-amber-800', bg: 'bg-amber-50 border-amber-200', label: 'High Risk' };
       case 'MEDIUM':
-        return { text: 'text-alert-medium', bg: 'bg-alert-medium/15 border-alert-medium/30', label: 'MEDIUM RISK' };
+        return { text: 'text-yellow-800', bg: 'bg-yellow-50 border-yellow-200', label: 'Medium Risk' };
       case 'LOW':
-        return { text: 'text-alert-low', bg: 'bg-alert-low/15 border-alert-low/30', label: 'LOW RISK' };
+        return { text: 'text-blue-800', bg: 'bg-blue-50 border-blue-200', label: 'Low Risk' };
       default:
-        return { text: 'text-cyan-400', bg: 'bg-cyan-400/15 border-cyan-400/30', label: 'NOMINAL' };
+        return { text: 'text-ocean-dark', bg: 'bg-ocean-surface border-ocean-border', label: 'Standard' };
     }
   };
 
@@ -121,80 +121,79 @@ export const AnomalyDetailPanel: React.FC<AnomalyPanelProps> = ({
   const estLength = (((detection.bbox[3] - detection.bbox[1]) / 640) * 100).toFixed(1);
 
   return (
-    <div className={cn("marine-card flex flex-col h-full overflow-hidden border border-white/[0.08]", className)}>
+    <div className={cn("ocean-card flex flex-col h-full overflow-hidden", className)}>
       
       {/* Header */}
-      <div className="p-4 bg-marine-950/90 border-b border-white/[0.08] shrink-0">
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="text-[10px] font-mono text-cyan-muted uppercase tracking-ultra">
-            ISOLATED TARGET #{detection.id.toString().padStart(3, '0')}
-          </div>
-          <span className={cn("text-[9px] font-mono px-2 py-0.5 rounded-sm border uppercase font-medium",
-            detection.status === 'verified' ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" :
-            detection.status === 'rejected' ? "bg-alert-critical/15 text-alert-critical border-alert-critical/30" :
-            "bg-surface-800 text-marineText-muted border-white/[0.08]"
+      <div className="p-5 bg-white border-b border-ocean-border shrink-0">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-ocean-accent bg-ocean-surface px-2.5 py-0.5 rounded-full border border-ocean-border">
+            Object #{detection.id}
+          </span>
+          <span className={cn("text-xs px-2.5 py-0.5 rounded-full border font-medium",
+            detection.status === 'verified' ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+            detection.status === 'rejected' ? "bg-red-50 text-red-700 border-red-200" :
+            "bg-ocean-surface text-ocean-muted border-ocean-border"
           )}>
-            {detection.status.toUpperCase()}
+            {detection.status === 'verified' ? 'Verified' : detection.status === 'rejected' ? 'Dismissed' : 'Pending Review'}
           </span>
         </div>
 
-        <h2 className="text-sm font-semibold tracking-wide text-marineText-primary capitalize">
+        <h2 className="text-base font-semibold text-ocean-dark capitalize">
           {detection.class_name ? detection.class_name.replace(/_/g, ' ') : 'Marine Debris Object'}
         </h2>
       </div>
 
-      {/* Scrollable Body */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Scrollable Details */}
+      <div className="flex-1 overflow-y-auto p-5 space-y-5">
         
-        {/* Risk & Fusion Assessment Card */}
-        <div className="p-3.5 bg-surface-900/60 border border-white/[0.06] rounded-sm">
+        {/* Risk Assessment Card */}
+        <div className="p-4 bg-ocean-surface/60 border border-ocean-border rounded-2xl">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-marineText-muted">
-              OPERATIONAL RISK INDEX
+            <span className="text-xs font-medium text-ocean-muted">
+              Environmental Risk Index
             </span>
-            <span className={cn("text-[10px] font-mono px-2 py-0.5 rounded-sm border font-semibold", risk.bg, risk.text)}>
+            <span className={cn("text-xs px-2.5 py-0.5 rounded-full border font-semibold", risk.bg, risk.text)}>
               {risk.label}
             </span>
           </div>
           
-          <div className="flex items-baseline justify-between mb-2">
-            <div className="text-2xl font-mono font-bold tracking-tight text-marineText-primary">
+          <div className="flex items-baseline justify-between mb-2.5">
+            <div className="text-2xl font-bold text-ocean-dark">
               {detection.risk.score}
-              <span className="text-xs font-normal text-marineText-dim"> / 100</span>
+              <span className="text-xs font-normal text-ocean-muted"> / 100</span>
             </div>
-            <div className="text-right text-[10px] font-mono text-marineText-muted">
-              EVIDENCE CONF: <span className="text-cyan-300 font-semibold">{Math.round(detection.confidence.final * 100)}%</span>
+            <div className="text-xs text-ocean-muted">
+              Confidence: <strong className="text-ocean-dark">{Math.round(detection.confidence.final * 100)}%</strong>
             </div>
           </div>
 
-          <div className="h-1.5 bg-marine-950 rounded-full overflow-hidden flex">
+          <div className="h-2 bg-white rounded-full overflow-hidden border border-ocean-border/60">
             <div 
-              className={cn("h-full transition-all duration-500", 
+              className={cn("h-full transition-all duration-500 rounded-full", 
                 detection.risk.level === 'CRITICAL' ? 'bg-alert-critical' :
                 detection.risk.level === 'HIGH' ? 'bg-alert-high' :
                 detection.risk.level === 'MEDIUM' ? 'bg-alert-medium' :
                 'bg-alert-low'
               )} 
-              style={{ width: `${Math.max(5, detection.risk.score)}%` }} 
+              style={{ width: `${Math.max(8, detection.risk.score)}%` }} 
             />
           </div>
         </div>
 
         {/* Evidence Fusion Breakdown */}
-        <div className="space-y-3 pt-1">
-          <div className="flex items-center justify-between border-b border-white/[0.06] pb-1.5">
-            <div className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest text-marineText-muted uppercase">
-              <Layers className="w-3 h-3 text-cyan-400" />
-              <span>Multi-Source Evidence</span>
-            </div>
-            <span className="text-[9px] font-mono text-cyan-muted/70">W_FUSION: 1.0</span>
+        <div className="space-y-3.5">
+          <div className="flex items-center gap-2 border-b border-ocean-border/60 pb-2">
+            <Layers className="w-4 h-4 text-ocean-accent" />
+            <h3 className="text-xs font-semibold text-ocean-dark uppercase tracking-wider">
+              Evidence Breakdown
+            </h3>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-3">
             <EvidenceBar 
               value={detection.confidence.model} 
-              label="Deep Inference Base" 
-              icon={Cpu}
+              label="Visual AI Inference" 
+              icon={Sparkles}
               weight="50%"
             />
             <EvidenceBar 
@@ -205,76 +204,76 @@ export const AnomalyDetailPanel: React.FC<AnomalyPanelProps> = ({
             />
             <EvidenceBar 
               value={detection.confidence.shape} 
-              label="Morphological Compactness" 
+              label="Shape Compactness" 
               icon={Ruler}
               weight="15%"
             />
             <EvidenceBar 
               value={detection.confidence.terrain} 
-              label="Bathymetric Contrast" 
-              icon={Activity}
+              label="Seabed Contrast" 
+              icon={Info}
               weight="10%"
             />
           </div>
         </div>
 
-        {/* Spatial Telemetry & Dimensions */}
-        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06]">
-          <div className="p-2.5 bg-surface-900/40 border border-white/[0.05] rounded-sm">
-            <div className="flex items-center gap-1 text-[9px] font-mono text-marineText-dim uppercase mb-1">
-              <MapPin className="w-2.5 h-2.5 text-cyan-400" />
-              <span>GEOLOCATION</span>
+        {/* Spatial Information */}
+        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-ocean-border/60">
+          <div className="p-3 bg-ocean-surface/50 border border-ocean-border/70 rounded-xl">
+            <div className="flex items-center gap-1.5 text-xs text-ocean-muted mb-1">
+              <MapPin className="w-3.5 h-3.5 text-ocean-accent" />
+              <span>Location</span>
             </div>
             {detection.location.latitude ? (
-              <div className="text-[11px] font-mono text-marineText-secondary leading-tight">
+              <div className="text-xs font-medium text-ocean-dark leading-tight">
                 {detection.location.latitude.toFixed(5)}°N<br/>
                 {detection.location.longitude?.toFixed(5)}°W
               </div>
             ) : (
-              <div className="text-[10px] font-mono text-marineText-dim italic">GPS ESTIMATED</div>
+              <div className="text-xs text-ocean-muted italic">Estimated from Swath</div>
             )}
           </div>
 
-          <div className="p-2.5 bg-surface-900/40 border border-white/[0.05] rounded-sm">
-            <div className="flex items-center gap-1 text-[9px] font-mono text-marineText-dim uppercase mb-1">
-              <Ruler className="w-2.5 h-2.5 text-cyan-400" />
-              <span>EST. FOOTPRINT</span>
+          <div className="p-3 bg-ocean-surface/50 border border-ocean-border/70 rounded-xl">
+            <div className="flex items-center gap-1.5 text-xs text-ocean-muted mb-1">
+              <Ruler className="w-3.5 h-3.5 text-ocean-accent" />
+              <span>Dimensions</span>
             </div>
-            <div className="text-[11px] font-mono text-marineText-secondary leading-tight">
+            <div className="text-xs font-medium text-ocean-dark leading-tight">
               {estLength}m × {estWidth}m<br/>
-              <span className="text-[9px] text-marineText-dim">SEABED SWATH</span>
+              <span className="text-[11px] text-ocean-muted font-normal">Approx. Footprint</span>
             </div>
           </div>
         </div>
 
       </div>
 
-      {/* Operator Action Bar */}
-      <div className="p-3 bg-marine-950/90 border-t border-white/[0.08] space-y-2 shrink-0">
+      {/* Operator Review Controls */}
+      <div className="p-4 bg-white border-t border-ocean-border space-y-2.5 shrink-0">
         <div className="grid grid-cols-2 gap-2">
           <button 
             onClick={() => onVerify?.(detection.id)}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-950/50 hover:bg-emerald-900/70 text-emerald-300 border border-emerald-500/30 rounded-sm transition-all duration-150 text-xs font-mono font-medium shadow-sm"
+            className="flex items-center justify-center gap-1.5 py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl transition-all duration-200 text-xs font-medium shadow-soft active:scale-[0.98]"
           >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>VERIFY</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Verify Object</span>
           </button>
           
           <button 
             onClick={() => onReject?.(detection.id)}
-            className="flex items-center justify-center gap-1.5 py-2 px-3 bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-500/30 rounded-sm transition-all duration-150 text-xs font-mono font-medium shadow-sm"
+            className="flex items-center justify-center gap-1.5 py-2 px-3 bg-red-50 hover:bg-red-100 text-red-800 border border-red-200 rounded-xl transition-all duration-200 text-xs font-medium shadow-soft active:scale-[0.98]"
           >
-            <XCircle className="w-3.5 h-3.5" />
-            <span>REJECT</span>
+            <XCircle className="w-4 h-4 text-red-600" />
+            <span>Dismiss</span>
           </button>
         </div>
 
         <button 
           onClick={() => onLocateOnMap?.(detection.id)}
-          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-surface-900 hover:bg-surface-800 text-cyan-muted hover:text-cyan-300 border border-white/[0.08] rounded-sm transition-all duration-150 text-[11px] font-mono"
+          className="ocean-btn-secondary w-full py-2 text-xs font-medium rounded-xl"
         >
-          <MapPin className="w-3 h-3 text-cyan-400" />
-          <span>PROJECT TO TACTICAL MAP</span>
+          <MapPin className="w-3.5 h-3.5 text-ocean-accent" />
+          <span>Locate on Bathymetry Map</span>
         </button>
       </div>
 

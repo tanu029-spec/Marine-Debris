@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, FastForward, SkipBack, Radio } from 'lucide-react';
+import { Play, Pause, FastForward, SkipBack, Compass, Eye } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface Frame {
@@ -13,7 +13,7 @@ interface TimelineProps {
   frames: Frame[];
   currentFrameIndex: number;
   onFrameChange: (index: number) => void;
-  detectionsByFrame: Record<number, number>; // frameId -> count
+  detectionsByFrame: Record<number, number>;
   className?: string;
 }
 
@@ -26,7 +26,6 @@ export const SurveyTimeline: React.FC<TimelineProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   
-  // Auto-play logic
   useEffect(() => {
     if (!isPlaying) return;
     
@@ -36,7 +35,7 @@ export const SurveyTimeline: React.FC<TimelineProps> = ({
       } else {
         setIsPlaying(false);
       }
-    }, 900);
+    }, 1000);
     
     return () => clearInterval(timer);
   }, [isPlaying, currentFrameIndex, frames.length, onFrameChange]);
@@ -48,85 +47,85 @@ export const SurveyTimeline: React.FC<TimelineProps> = ({
   const coveragePercent = frames.length > 0 ? Math.round((processedCount / frames.length) * 100) : 0;
 
   return (
-    <div className={cn("marine-card flex flex-col justify-between p-3 border border-white/[0.08] bg-marine-950/80 backdrop-blur-md select-none", className)}>
+    <div className={cn("ocean-card flex flex-col justify-between p-4 bg-white select-none", className)}>
       
-      {/* Top Scrubber Header */}
+      {/* Scrubber Top Controls */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span className="text-[10px] font-mono tracking-ultra text-marineText-muted uppercase">
-              SURVEY SCRUBBER
+          <div className="flex items-center gap-2">
+            <Eye className="w-4 h-4 text-ocean-accent" />
+            <span className="text-xs font-semibold text-ocean-dark">
+              Survey Frame Scrubber
             </span>
           </div>
-          <span className="text-white/10 text-xs">|</span>
-          <span className="text-[10px] font-mono text-cyan-muted">
-            FRAME {currentFrameIndex + 1} OF {Math.max(1, frames.length)}
+          <span className="text-ocean-border text-xs">|</span>
+          <span className="text-xs text-ocean-muted">
+            Frame <strong className="text-ocean-dark">{currentFrameIndex + 1}</strong> of {Math.max(1, frames.length)}
           </span>
         </div>
 
         {/* Transport Controls */}
-        <div className="flex items-center gap-1.5 bg-surface-900/80 px-2 py-1 rounded-sm border border-white/[0.06]">
+        <div className="flex items-center gap-1.5 bg-ocean-surface px-2.5 py-1 rounded-xl border border-ocean-border">
           <button 
-            className="p-1 text-marineText-muted hover:text-cyan-300 transition-colors disabled:opacity-30"
+            className="p-1 text-ocean-muted hover:text-ocean-dark transition-colors disabled:opacity-30"
             onClick={() => onFrameChange(0)}
             disabled={currentFrameIndex === 0}
-            title="Return to Start"
+            title="Start of Survey"
           >
             <SkipBack className="w-3.5 h-3.5" />
           </button>
           
           <button 
             className={cn(
-              "px-2 py-0.5 rounded-sm text-xs font-mono transition-all flex items-center gap-1",
+              "px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 shadow-soft",
               isPlaying 
-                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
-                : "bg-ocean-800/80 text-cyan-300 border border-cyan-400/30 hover:bg-ocean-700"
+                ? "bg-amber-100 text-amber-800" 
+                : "bg-ocean-accent hover:bg-ocean-hover text-white"
             )}
             onClick={togglePlay}
           >
             {isPlaying ? (
               <>
-                <Pause className="w-3 h-3" />
-                <span className="text-[10px]">PAUSE</span>
+                <Pause className="w-3.5 h-3.5" />
+                <span>Pause</span>
               </>
             ) : (
               <>
-                <Play className="w-3 h-3" />
-                <span className="text-[10px]">PLAY</span>
+                <Play className="w-3.5 h-3.5" />
+                <span>Play</span>
               </>
             )}
           </button>
 
           <button 
-            className="p-1 text-marineText-muted hover:text-cyan-300 transition-colors disabled:opacity-30"
+            className="p-1 text-ocean-muted hover:text-ocean-dark transition-colors disabled:opacity-30"
             onClick={() => onFrameChange(Math.min(frames.length - 1, currentFrameIndex + 5))}
             disabled={currentFrameIndex >= frames.length - 1}
-            title="Step Forward 5 Frames"
+            title="Forward 5 Frames"
           >
             <FastForward className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
       
-      {/* Interactive Timeline Track */}
-      <div className="relative h-7 flex items-center px-1">
+      {/* Scrubber Track */}
+      <div className="relative h-6 flex items-center px-1">
         
         {/* Background Track */}
-        <div className="absolute left-0 right-0 h-1.5 bg-marine-900 rounded-sm overflow-hidden border border-white/[0.05]">
+        <div className="absolute left-0 right-0 h-2 bg-ocean-surface rounded-full overflow-hidden border border-ocean-border">
           <div 
-            className="h-full bg-ocean-800/70 transition-all duration-300"
+            className="h-full bg-ocean-light/80 transition-all duration-300"
             style={{ width: `${coveragePercent}%` }}
           />
         </div>
         
-        {/* Playhead Glowing Line */}
+        {/* Playhead Indicator */}
         <div 
-          className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 shadow-[0_0_8px_#42D7E8] transition-all duration-150 pointer-events-none z-20"
+          className="absolute top-0 bottom-0 w-1 bg-ocean-accent rounded-full shadow-[0_0_8px_rgba(45,159,178,0.4)] transition-all duration-150 pointer-events-none z-20"
           style={{ left: `${frames.length > 1 ? (currentFrameIndex / (frames.length - 1)) * 100 : 0}%` }}
         />
         
-        {/* Anomaly Ping Markers */}
+        {/* Frame Markers */}
         <div className="absolute inset-0 flex items-center z-10 pointer-events-auto">
           {frames.map((frame, idx) => {
             const detCount = detectionsByFrame[frame.id] || 0;
@@ -134,19 +133,18 @@ export const SurveyTimeline: React.FC<TimelineProps> = ({
             const isCurrent = idx === currentFrameIndex;
             const pos = frames.length > 1 ? (idx / (frames.length - 1)) * 100 : 0;
             
-            // Limit render count for performance
-            if (!hasDetections && !isCurrent && idx % 4 !== 0) return null;
+            if (!hasDetections && !isCurrent && idx % 3 !== 0) return null;
             
             return (
               <button
                 key={frame.id}
                 className={cn(
-                  "absolute -translate-x-1/2 rounded-full transition-all duration-150 focus:outline-none",
+                  "absolute -translate-x-1/2 rounded-full transition-all duration-200 focus:outline-none",
                   isCurrent 
-                    ? "w-3 h-3 bg-cyan-300 ring-2 ring-cyan-400/50 shadow-[0_0_12px_#42D7E8] z-30" 
+                    ? "w-4 h-4 bg-white border-2 border-ocean-accent shadow-md z-30" 
                     : hasDetections 
-                      ? "w-2.5 h-2.5 bg-alert-high hover:scale-150 ring-1 ring-alert-high/60 shadow-[0_0_6px_#FB923C] z-20" 
-                      : "w-1 h-1 bg-surface-700 hover:bg-marineText-muted z-10"
+                      ? "w-3 h-3 bg-alert-high border border-white hover:scale-125 shadow-sm z-20" 
+                      : "w-1.5 h-1.5 bg-ocean-border hover:bg-ocean-medium z-10"
                 )}
                 style={{ left: `${pos}%` }}
                 onClick={() => onFrameChange(idx)}
@@ -157,15 +155,16 @@ export const SurveyTimeline: React.FC<TimelineProps> = ({
         </div>
       </div>
       
-      {/* Bottom Metadata & Coverage Bar */}
-      <div className="flex items-center justify-between text-[10px] font-mono text-marineText-dim pt-1 border-t border-white/[0.04]">
+      {/* Bottom Information */}
+      <div className="flex items-center justify-between text-xs text-ocean-muted pt-2 border-t border-ocean-border/60">
         <div className="flex items-center gap-3">
-          <span>SWATH: <span className="text-marineText-secondary">{currentFrame?.frame_identifier || 'SWATH_0001'}</span></span>
-          <span className="hidden sm:inline text-white/10">|</span>
-          <span className="hidden sm:inline">PROCESSING: <span className="text-emerald-400">{coveragePercent}% COMPLETE</span></span>
+          <span>Swath: <strong className="text-ocean-dark font-medium">{currentFrame?.frame_identifier || 'swath_0001.jpg'}</strong></span>
+          <span className="hidden sm:inline text-ocean-border">|</span>
+          <span className="hidden sm:inline">Coverage: <strong className="text-alert-success">{coveragePercent}% analyzed</strong></span>
         </div>
-        <div className="flex items-center gap-2">
-          <span>SURVEY DURATION: <span className="text-marineText-secondary">00:42:15</span></span>
+        <div className="flex items-center gap-1.5 text-ocean-accent font-medium">
+          <Compass className="w-3.5 h-3.5" />
+          <span>AUV Survey Line 01</span>
         </div>
       </div>
 

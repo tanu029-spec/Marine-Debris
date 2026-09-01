@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
-  Radar, 
-  Activity, 
-  LayoutDashboard, 
+  Waves, 
+  Eye, 
   Map as MapIcon, 
   FileText, 
   Compass,
-  Radio
+  Menu,
+  X
 } from 'lucide-react';
 import { cn } from './lib/utils';
 
@@ -17,7 +17,7 @@ import SurveyView from './pages/SurveyView';
 import MapView from './pages/MapView';
 import Reports from './pages/Reports';
 
-const NavItem = ({ to, icon: Icon, label, code }: { to: string; icon: any; label: string; code: string }) => {
+const NavLink = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   
@@ -25,33 +25,26 @@ const NavItem = ({ to, icon: Icon, label, code }: { to: string; icon: any; label
     <Link 
       to={to} 
       className={cn(
-        "group relative flex items-center justify-between px-4 py-3 border-l-2 transition-all duration-200 text-xs font-mono tracking-wider",
+        "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
         isActive 
-          ? "border-cyan-400 bg-gradient-to-r from-cyan-950/40 via-surface-900/30 to-transparent text-cyan-300 font-medium" 
-          : "border-transparent text-marineText-muted hover:text-marineText-primary hover:bg-surface-900/40"
+          ? "bg-ocean-soft text-ocean-dark shadow-sm border border-ocean-border/60 font-semibold" 
+          : "text-ocean-muted hover:text-ocean-dark hover:bg-ocean-surface/70"
       )}
     >
-      <div className="flex items-center gap-3">
-        <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-cyan-400" : "text-marineText-dim group-hover:text-cyan-muted")} />
-        <span className="tracking-wide">{label}</span>
-      </div>
-      <span className={cn("text-[9px] font-mono", isActive ? "text-cyan-400/80" : "text-marineText-dim/50")}>
-        {code}
-      </span>
-      {isActive && (
-        <span className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-3 bg-cyan-400/80 rounded-l-sm" />
-      )}
+      <Icon className={cn("w-4 h-4 transition-colors", isActive ? "text-ocean-accent" : "text-ocean-muted")} />
+      <span>{label}</span>
     </Link>
   );
 };
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Header = () => {
   const [time, setTime] = useState<string>('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setTime(now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC');
+      setTime(now.toISOString().substring(11, 19) + ' UTC');
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -59,138 +52,102 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-marine-950 overflow-hidden text-marineText-primary">
-      {/* Sleek Subsea Sidebar */}
-      <aside className="w-64 bg-marine-900/95 border-r border-white/[0.08] flex flex-col z-30 shrink-0 select-none backdrop-blur-md">
+    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-ocean-border/80 shadow-soft">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
-        {/* Brand Header */}
-        <div className="h-16 flex flex-col justify-center px-5 border-b border-white/[0.08] bg-marine-950/60">
-          <div className="flex items-center gap-2.5">
-            <div className="relative flex items-center justify-center w-7 h-7 rounded-sm bg-surface-900 border border-cyan-500/30">
-              <Radar className="w-4 h-4 text-cyan-400" />
-              <div className="absolute inset-0 rounded-sm bg-cyan-400/10 animate-pulse" />
+        {/* Brand */}
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-ocean-accent to-ocean-light flex items-center justify-center text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
+              <Waves className="w-5 h-5 animate-water-drift" />
             </div>
             <div>
-              <div className="text-xs font-semibold tracking-ultra text-marineText-primary uppercase">
+              <div className="text-base font-semibold tracking-tight text-ocean-dark leading-tight">
                 Eye of Poseidon
               </div>
-              <div className="text-[9px] font-mono tracking-widest text-cyan-muted/80 uppercase">
-                Sonar Intelligence
+              <div className="text-[11px] text-ocean-muted font-normal tracking-normal">
+                Marine Debris Intelligence
               </div>
             </div>
-          </div>
+          </Link>
         </div>
 
-        {/* Tactical Sub-header / System Status */}
-        <div className="px-5 py-3 border-b border-white/[0.05] bg-marine-900/40 flex items-center justify-between text-[10px] font-mono">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span className="tracking-widest text-emerald-400/90 font-medium">ACOUSTIC LINK</span>
-          </div>
-          <span className="text-marineText-dim">NODE-01</span>
-        </div>
-        
-        {/* Navigation */}
-        <div className="px-4 pt-4 pb-2 text-[9px] font-mono tracking-ultra text-marineText-dim uppercase">
-          Command Modules
-        </div>
-        <nav className="flex-1 flex flex-col gap-0.5">
-          <NavItem to="/" icon={LayoutDashboard} label="Mission Overview" code="MOD-01" />
-          <NavItem to="/survey" icon={Activity} label="Sonar Acoustic Feed" code="MOD-02" />
-          <NavItem to="/map" icon={MapIcon} label="Tactical Bathymetry" code="MOD-03" />
-          <NavItem to="/reports" icon={FileText} label="Intelligence Export" code="MOD-04" />
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-1.5 p-1 bg-ocean-surface/60 border border-ocean-border/50 rounded-2xl">
+          <NavLink to="/" icon={Waves} label="Overview" />
+          <NavLink to="/survey" icon={Eye} label="Sonar Feed" />
+          <NavLink to="/map" icon={MapIcon} label="Bathymetry Map" />
+          <NavLink to="/reports" icon={FileText} label="Reports & Export" />
         </nav>
-        
-        {/* Subsea Telemetry Widget */}
-        <div className="p-4 m-3 bg-surface-900/50 border border-white/[0.06] rounded-sm text-[11px] font-mono">
-          <div className="flex items-center justify-between text-marineText-muted mb-2">
-            <span className="text-[9px] tracking-widest uppercase">Telemetry</span>
-            <Radio className="w-3 h-3 text-cyan-400" />
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-[10px]">
-            <div>
-              <div className="text-marineText-dim text-[8px] uppercase tracking-wider">Swath Width</div>
-              <div className="text-cyan-300 font-medium">100.0 m</div>
-            </div>
-            <div>
-              <div className="text-marineText-dim text-[8px] uppercase tracking-wider">Frequency</div>
-              <div className="text-marineText-secondary">450 kHz</div>
-            </div>
-            <div>
-              <div className="text-marineText-dim text-[8px] uppercase tracking-wider">Tow Altitude</div>
-              <div className="text-marineText-secondary">12.4 m</div>
-            </div>
-            <div>
-              <div className="text-marineText-dim text-[8px] uppercase tracking-wider">Tow Speed</div>
-              <div className="text-marineText-secondary">3.2 kts</div>
-            </div>
-          </div>
-        </div>
 
-        {/* Footer info */}
-        <div className="p-3 border-t border-white/[0.08] bg-marine-950/80 flex items-center justify-between text-[10px] font-mono text-marineText-dim">
-          <span>SIH-26057 MVP</span>
-          <span className="text-cyan-muted/60">v1.2.0</span>
-        </div>
-      </aside>
-
-      {/* Main Command Display */}
-      <main className="flex-1 flex flex-col relative overflow-hidden bg-marine-900">
-        
-        {/* Tactical Top Bar */}
-        <header className="h-14 bg-marine-950/80 backdrop-blur-md border-b border-white/[0.08] flex items-center justify-between px-6 z-20 shrink-0">
+        {/* Status Pill & Time */}
+        <div className="hidden lg:flex items-center gap-4">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-ocean-surface/80 border border-ocean-border rounded-xl text-xs text-ocean-dark font-medium">
+            <span className="w-2 h-2 rounded-full bg-alert-success animate-pulse" />
+            <span>Mission OPN-TRITON-26</span>
+          </div>
           
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono text-marineText-dim uppercase tracking-widest">ACTIVE SURVEY:</span>
-              <span className="text-xs font-mono font-medium text-cyan-300 bg-surface-900/80 px-2.5 py-0.5 rounded-sm border border-cyan-500/20 shadow-[0_0_10px_rgba(66,215,232,0.1)]">
-                OPN-TRITON-26
-              </span>
-            </div>
-            <span className="text-white/10">|</span>
-            <div className="hidden md:flex items-center gap-2 text-xs font-mono text-marineText-muted">
-              <Compass className="w-3.5 h-3.5 text-cyan-400" />
-              <span>35°07'28.4"N 120°27'24.1"W</span>
-            </div>
+          <div className="flex items-center gap-1.5 text-xs text-ocean-muted font-mono">
+            <Compass className="w-3.5 h-3.5 text-ocean-accent" />
+            <span>{time}</span>
           </div>
-
-          <div className="flex items-center gap-5">
-            <div className="hidden lg:flex items-center gap-2 text-[11px] font-mono text-marineText-muted">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>AI HEURISTIC ENGINE: <span className="text-marineText-primary font-medium">READY</span></span>
-            </div>
-            <div className="text-right font-mono">
-              <div className="text-[9px] tracking-ultra text-marineText-dim uppercase">Zulu Time</div>
-              <div className="text-xs text-marineText-primary font-medium tracking-wide">
-                {time || 'SYNCHRONIZING...'}
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content Viewport */}
-        <div className="flex-1 overflow-auto bg-gradient-to-b from-marine-900 via-marine-950 to-marine-950">
-          {children}
         </div>
-      </main>
-    </div>
+
+        {/* Mobile menu trigger */}
+        <button 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden p-2 text-ocean-dark hover:bg-ocean-surface rounded-xl transition-colors"
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+
+      </div>
+
+      {/* Mobile menu dropdown */}
+      {mobileMenuOpen && (
+        <div className="md:hidden px-4 pt-2 pb-4 border-t border-ocean-border bg-white/95 backdrop-blur-md space-y-1">
+          <div onClick={() => setMobileMenuOpen(false)}>
+            <NavLink to="/" icon={Waves} label="Overview" />
+          </div>
+          <div onClick={() => setMobileMenuOpen(false)}>
+            <NavLink to="/survey" icon={Eye} label="Sonar Feed" />
+          </div>
+          <div onClick={() => setMobileMenuOpen(false)}>
+            <NavLink to="/map" icon={MapIcon} label="Bathymetry Map" />
+          </div>
+          <div onClick={() => setMobileMenuOpen(false)}>
+            <NavLink to="/reports" icon={FileText} label="Reports & Export" />
+          </div>
+        </div>
+      )}
+    </header>
   );
 };
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/survey" element={<SurveyView />} />
-          <Route path="/map" element={<MapView />} />
-          <Route path="/reports" element={<Reports />} />
-        </Routes>
-      </Layout>
+      <div className="min-h-screen flex flex-col bg-ocean-bg text-ocean-dark selection:bg-ocean-light/40 relative overflow-hidden">
+        
+        {/* Subtle Ambient Sunlight & Floating Marine Glows */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-ocean-soft/40 rounded-full blur-3xl pointer-events-none -z-10 animate-sunlight" />
+        <div className="absolute top-1/3 right-10 w-80 h-80 bg-ocean-surface/70 rounded-full blur-3xl pointer-events-none -z-10" />
+        
+        {/* Gentle Ambient Water Droplets/Bubbles */}
+        <div className="absolute top-24 left-10 w-3 h-3 rounded-full bg-ocean-light/30 blur-[0.5px] pointer-events-none animate-bubble-1" />
+        <div className="absolute top-48 right-32 w-2 h-2 rounded-full bg-ocean-medium/25 blur-[0.5px] pointer-events-none animate-bubble-2" />
+
+        <Header />
+
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/survey" element={<SurveyView />} />
+            <Route path="/map" element={<MapView />} />
+            <Route path="/reports" element={<Reports />} />
+          </Routes>
+        </main>
+      </div>
     </BrowserRouter>
   );
 }

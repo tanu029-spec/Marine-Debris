@@ -1,4 +1,4 @@
-import { ShieldAlert, Table, Code2, ArrowDownToLine } from 'lucide-react';
+import { Table, Code2, ArrowDownToLine, ShieldCheck } from 'lucide-react';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -12,140 +12,137 @@ export default function Reports() {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-8 animate-fadeIn select-none">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
       {/* Header */}
-      <div className="border-b border-white/[0.08] pb-4 flex items-center justify-between">
+      <div className="border-b border-ocean-border/70 pb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <span className="text-[10px] font-mono tracking-ultra text-marineText-muted uppercase">
-              DATA EXPORT ENGINE
-            </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-surface border border-ocean-border text-xs text-ocean-accent font-medium mb-2">
+            <span>Survey Intelligence & Reports</span>
           </div>
-          <h1 className="text-2xl font-light tracking-tight text-marineText-primary font-sans">
-            MISSION INTELLIGENCE <span className="font-semibold text-cyan-300">PACKAGES</span>
+          <h1 className="text-3xl font-light text-ocean-dark tracking-tight">
+            Export Mission <span className="font-semibold text-ocean-accent">Data Packages</span>
           </h1>
-          <p className="text-xs text-marineText-secondary mt-1 font-sans font-light">
-            Generate standardized acoustic detection datasets, georeferenced telemetry, and structured evidence matrices.
+          <p className="text-sm text-ocean-muted mt-1.5 leading-relaxed max-w-xl">
+            Download standardized marine anomaly catalogs, GPS coordinates, and evidence matrices for oceanographic research or cleanup planning.
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-cyan-muted bg-surface-900/60 px-3 py-1.5 rounded-sm border border-white/[0.08]">
-          <span>MISSION: OPN-TRITON-26</span>
+        <div className="px-3.5 py-1.5 bg-white border border-ocean-border rounded-xl text-xs font-medium text-ocean-dark shadow-soft">
+          Mission OPN-TRITON-26
         </div>
       </div>
 
       {/* Export Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        {/* CSV Tabular Package */}
-        <div className="marine-card p-6 flex flex-col justify-between border border-white/[0.08] space-y-6 relative group hover:border-cyan-400/30 transition-all duration-200">
+        {/* CSV Tabular Card */}
+        <div className="ocean-card p-7 flex flex-col justify-between space-y-6 hover:border-ocean-accent/40">
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-surface-900 rounded-sm text-cyan-400 border border-white/[0.06]">
+                <div className="w-10 h-10 rounded-xl bg-ocean-soft/60 flex items-center justify-center text-ocean-accent shadow-soft">
                   <Table className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold tracking-wide text-marineText-primary font-mono uppercase">
-                    Tabular Anomaly Manifest (CSV)
+                  <h2 className="text-base font-semibold text-ocean-dark">
+                    Tabular Dataset (CSV)
                   </h2>
-                  <div className="text-[10px] font-mono text-cyan-muted/80">
-                    MIME: text/csv · GIS & ArcGIS COMPATIBLE
+                  <div className="text-xs text-ocean-muted">
+                    GIS & Spreadsheet Compatible
                   </div>
                 </div>
               </div>
-              <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded-sm border border-emerald-500/20">
-                READY
+              <span className="text-xs font-medium text-alert-success bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Ready
               </span>
             </div>
 
-            <p className="text-xs text-marineText-secondary leading-relaxed font-light">
-              Full tabular export containing isolated anomaly coordinates (WGS-84), AI model confidence base, physics heuristic weights (shadow, shape, terrain), estimated swath dimensions, and operator review states.
+            <p className="text-xs text-ocean-muted leading-relaxed">
+              Export all detected marine anomalies with WGS-84 coordinates, AI model scores, shadow & shape metrics, estimated dimensions, and verification status.
             </p>
 
-            <div className="space-y-1.5 text-[11px] font-mono text-marineText-dim pt-2 border-t border-white/[0.05]">
+            <div className="space-y-2 text-xs text-ocean-muted pt-3 border-t border-ocean-border/60">
               <div className="flex justify-between">
-                <span>FORMAT SPEC:</span>
-                <span className="text-marineText-secondary">RFC 4180 Standard</span>
+                <span>File Format:</span>
+                <span className="font-medium text-ocean-dark">Standard CSV (Comma-Delimited)</span>
               </div>
               <div className="flex justify-between">
-                <span>COORDINATES:</span>
-                <span className="text-marineText-secondary">Decimal Degrees (EPSG:4326)</span>
+                <span>Coordinate System:</span>
+                <span className="font-medium text-ocean-dark">EPSG:4326 (WGS-84)</span>
               </div>
             </div>
           </div>
 
           <button 
             onClick={handleExportCSV}
-            className="marine-btn-primary w-full py-2.5 text-xs font-mono font-medium shadow-md"
+            className="ocean-btn-primary w-full py-2.5 text-sm"
           >
             <ArrowDownToLine className="w-4 h-4" />
-            <span>DOWNLOAD CSV MANIFEST</span>
+            <span>Download CSV Manifest</span>
           </button>
         </div>
 
-        {/* JSON Graph Package */}
-        <div className="marine-card p-6 flex flex-col justify-between border border-white/[0.08] space-y-6 relative group hover:border-cyan-400/30 transition-all duration-200">
+        {/* JSON Graph Card */}
+        <div className="ocean-card p-7 flex flex-col justify-between space-y-6 hover:border-ocean-accent/40">
           
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-surface-900 rounded-sm text-cyan-400 border border-white/[0.06]">
+                <div className="w-10 h-10 rounded-xl bg-ocean-soft/60 flex items-center justify-center text-ocean-accent shadow-soft">
                   <Code2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold tracking-wide text-marineText-primary font-mono uppercase">
-                    Hierarchical Intelligence (JSON)
+                  <h2 className="text-base font-semibold text-ocean-dark">
+                    Structured Intelligence (JSON)
                   </h2>
-                  <div className="text-[10px] font-mono text-cyan-muted/80">
-                    MIME: application/json · API PAYLOAD SPEC
+                  <div className="text-xs text-ocean-muted">
+                    API & Pipeline Payload Spec
                   </div>
                 </div>
               </div>
-              <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded-sm border border-emerald-500/20">
-                READY
+              <span className="text-xs font-medium text-alert-success bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Ready
               </span>
             </div>
 
-            <p className="text-xs text-marineText-secondary leading-relaxed font-light">
-              Structured object graph containing full acoustic mission metadata, frame-by-frame transducer parameters, multi-source evidence fusion breakdowns, bounding box normalized coordinates, and risk indices.
+            <p className="text-xs text-ocean-muted leading-relaxed">
+              Full hierarchical mission graph containing frame parameters, normalized bounding box coordinates, multi-source evidence breakdowns, and survey track logs.
             </p>
 
-            <div className="space-y-1.5 text-[11px] font-mono text-marineText-dim pt-2 border-t border-white/[0.05]">
+            <div className="space-y-2 text-xs text-ocean-muted pt-3 border-t border-ocean-border/60">
               <div className="flex justify-between">
-                <span>SCHEMA:</span>
-                <span className="text-marineText-secondary">Poseidon-Graph v1.2</span>
+                <span>Schema Spec:</span>
+                <span className="font-medium text-ocean-dark">Poseidon-Graph v1.2</span>
               </div>
               <div className="flex justify-between">
-                <span>INTEGRATION:</span>
-                <span className="text-marineText-secondary">Direct REST API Compatible</span>
+                <span>Encoding:</span>
+                <span className="font-medium text-ocean-dark">UTF-8 JSON</span>
               </div>
             </div>
           </div>
 
           <button 
             onClick={handleExportJSON}
-            className="marine-btn-primary w-full py-2.5 text-xs font-mono font-medium shadow-md"
+            className="ocean-btn-primary w-full py-2.5 text-sm"
           >
             <ArrowDownToLine className="w-4 h-4" />
-            <span>DOWNLOAD JSON GRAPH</span>
+            <span>Download JSON Dataset</span>
           </button>
         </div>
 
       </div>
 
-      {/* Operational Security Classification Warning */}
-      <div className="marine-card p-5 border-l-2 border-l-amber-500/80 bg-amber-950/15">
-        <div className="flex items-start gap-4">
-          <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+      {/* Environmental Data Note */}
+      <div className="ocean-card p-5 bg-ocean-surface/60 border border-ocean-border">
+        <div className="flex items-start gap-3.5">
+          <ShieldCheck className="w-5 h-5 text-ocean-accent shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <h3 className="text-xs font-mono font-semibold tracking-wider text-amber-300 uppercase">
-              Acoustic Hydrographic Data Security Protocol
+            <h3 className="text-xs font-semibold text-ocean-dark">
+              Environmental Conservation Data Sharing
             </h3>
-            <p className="text-xs text-marineText-secondary leading-relaxed font-light">
-              Exported hydrographic datasets may reveal sensitive bathymetric profiles, critical subsea infrastructure (cables, pipelines), or historical marine heritage coordinates. Verify clearance levels prior to unencrypted distribution.
+            <p className="text-xs text-ocean-muted leading-relaxed">
+              Survey data can be directly integrated into GIS software for planning coastal marine cleanup operations, reef preservation surveys, and underwater cable safety inspections.
             </p>
           </div>
         </div>

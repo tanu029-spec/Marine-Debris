@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layers, Crosshair, Sparkles } from 'lucide-react';
+import { Layers, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export interface Detection {
@@ -31,111 +31,104 @@ export const SonarViewer: React.FC<SonarViewerProps> = ({
   const [showOverlays, setShowOverlays] = useState(true);
   const [hoveredDetId, setHoveredDetId] = useState<number | null>(null);
 
-  // Fallback to original if processed not available
   const activeImage = viewMode === 'processed' && processedImage ? processedImage : originalImage;
 
-  const getRiskDetails = (level: string) => {
+  const getRiskStyle = (level: string) => {
     switch (level?.toUpperCase()) {
       case 'CRITICAL':
-        return { stroke: '#F87171', fill: 'rgba(248, 113, 113, 0.15)', text: 'text-alert-critical', bg: 'bg-alert-critical/20' };
+        return { stroke: '#E06A60', fill: 'rgba(224, 106, 96, 0.12)', badgeBg: '#FDF2F2', badgeText: '#C53030' };
       case 'HIGH':
-        return { stroke: '#FB923C', fill: 'rgba(251, 146, 60, 0.15)', text: 'text-alert-high', bg: 'bg-alert-high/20' };
+        return { stroke: '#E59846', fill: 'rgba(229, 152, 70, 0.12)', badgeBg: '#FEF8EE', badgeText: '#C05621' };
       case 'MEDIUM':
-        return { stroke: '#FACC15', fill: 'rgba(250, 204, 21, 0.15)', text: 'text-alert-medium', bg: 'bg-alert-medium/20' };
+        return { stroke: '#D4A017', fill: 'rgba(212, 160, 23, 0.10)', badgeBg: '#FEFCF0', badgeText: '#975A16' };
       case 'LOW':
-        return { stroke: '#38BDF8', fill: 'rgba(56, 189, 248, 0.12)', text: 'text-alert-low', bg: 'bg-alert-low/20' };
+        return { stroke: '#4FAEC0', fill: 'rgba(79, 174, 192, 0.10)', badgeBg: '#F0F9FB', badgeText: '#2B6CB0' };
       default:
-        return { stroke: '#42D7E8', fill: 'rgba(66, 215, 232, 0.12)', text: 'text-cyan-400', bg: 'bg-cyan-400/20' };
+        return { stroke: '#2D9FB2', fill: 'rgba(45, 159, 178, 0.10)', badgeBg: '#EAF7F8', badgeText: '#163F47' };
     }
   };
 
   return (
-    <div className={cn("marine-card flex flex-col h-full overflow-hidden border border-white/[0.08] relative", className)}>
+    <div className={cn("ocean-card flex flex-col h-full overflow-hidden relative", className)}>
       
-      {/* Precision Instrument Control Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-marine-950/90 border-b border-white/[0.08] z-10 shrink-0">
+      {/* Clean Light Header & Controls */}
+      <div className="flex items-center justify-between px-5 py-3.5 bg-white border-b border-ocean-border z-10 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <span className="text-xs font-mono font-medium tracking-wider text-marineText-primary">
-              ACOUSTIC SWATH APERTURE
-            </span>
+          <div className="w-8 h-8 rounded-xl bg-ocean-soft/60 flex items-center justify-center text-ocean-accent">
+            <ImageIcon className="w-4 h-4" />
           </div>
-          <span className="text-white/10 text-xs">|</span>
-          <span className="text-[10px] font-mono text-cyan-muted/80 bg-surface-900/60 px-2 py-0.5 rounded-sm border border-white/[0.05]">
-            {detections.length} ANOMAL{detections.length === 1 ? 'Y' : 'IES'} ISOLATED
-          </span>
+          <div>
+            <h3 className="text-sm font-semibold text-ocean-dark leading-tight">
+              Acoustic Sonar Waterfall
+            </h3>
+            <p className="text-[11px] text-ocean-muted">
+              {detections.length} {detections.length === 1 ? 'object' : 'objects'} identified in current frame
+            </p>
+          </div>
         </div>
         
-        {/* Toggle Controls */}
+        {/* Toggle Mode Controls */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center p-0.5 bg-surface-900/90 rounded-sm border border-white/[0.06]">
+          <div className="flex items-center p-1 bg-ocean-surface rounded-xl border border-ocean-border/60">
             <button
               onClick={() => setViewMode('original')}
               className={cn(
-                "px-2.5 py-1 text-[10px] font-mono tracking-wider rounded-sm transition-all duration-150",
+                "px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200",
                 viewMode === 'original' 
-                  ? "bg-ocean-800 text-cyan-300 font-medium shadow-sm border border-cyan-400/20" 
-                  : "text-marineText-muted hover:text-marineText-primary"
+                  ? "bg-white text-ocean-dark shadow-soft font-semibold" 
+                  : "text-ocean-muted hover:text-ocean-dark"
               )}
             >
-              RAW SWATH
+              Raw Sonar
             </button>
             <button
               onClick={() => setViewMode('processed')}
               disabled={!processedImage}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono tracking-wider rounded-sm transition-all duration-150",
+                "flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-all duration-200",
                 viewMode === 'processed' 
-                  ? "bg-ocean-800 text-cyan-300 font-medium shadow-sm border border-cyan-400/20" 
-                  : "text-marineText-muted hover:text-marineText-primary",
+                  ? "bg-white text-ocean-accent shadow-soft font-semibold" 
+                  : "text-ocean-muted hover:text-ocean-dark",
                 !processedImage && "opacity-40 cursor-not-allowed"
               )}
             >
-              <Sparkles className="w-3 h-3 text-cyan-400" />
-              <span>CLAHE FILTER</span>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Clarity Filter</span>
             </button>
           </div>
           
           <button
             onClick={() => setShowOverlays(!showOverlays)}
             className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono tracking-wider rounded-sm border transition-all duration-150",
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200 shadow-soft",
               showOverlays 
-                ? "bg-surface-800 border-cyan-400/30 text-cyan-300" 
-                : "bg-surface-900/60 border-white/[0.06] text-marineText-dim hover:text-marineText-secondary"
+                ? "bg-ocean-soft border-ocean-light text-ocean-dark font-semibold" 
+                : "bg-white border-ocean-border text-ocean-muted hover:text-ocean-dark"
             )}
-            title="Toggle Acoustic Bounding Overlays"
+            title="Toggle Bounding Boxes"
           >
-            <Layers className="w-3 h-3" />
-            <span className="hidden sm:inline">OVERLAYS</span>
+            <Layers className="w-3.5 h-3.5 text-ocean-accent" />
+            <span className="hidden sm:inline">Overlays</span>
           </button>
         </div>
       </div>
       
-      {/* Subsea Sonar Viewport */}
-      <div className="relative flex-1 bg-[#03090B] overflow-hidden flex items-center justify-center min-h-[420px] p-2 select-none">
+      {/* Sonar Image Viewport */}
+      <div className="relative flex-1 bg-slate-900/95 overflow-hidden flex items-center justify-center min-h-[420px] p-4 select-none">
         
-        {/* Subtle Sonar Grid Backdrop */}
-        <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#126579_1px,transparent_1px)] [background-size:24px_24px]" />
-        
-        {/* Swath Telemetry Guides */}
-        <div className="absolute left-3 top-3 bottom-3 w-px bg-white/[0.08] flex flex-col justify-between py-2 text-[8px] font-mono text-marineText-dim pointer-events-none">
-          <span>PORT +50m</span>
-          <span>NADIR 0m</span>
-          <span>STBD -50m</span>
-        </div>
+        {/* Subtle Depth Background */}
+        <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(#8FD3DE_1px,transparent_1px)] [background-size:20px_20px]" />
 
         {activeImage ? (
           <div className="relative inline-block max-w-full max-h-full">
             <img 
               src={activeImage} 
               alt="Sonar Acoustic Feed" 
-              className="max-w-full max-h-full object-contain rounded-sm shadow-2xl border border-white/[0.06]"
-              style={{ maxHeight: 'calc(100vh - 280px)' }}
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-slate-700/50"
+              style={{ maxHeight: 'calc(100vh - 300px)' }}
             />
             
-            {/* SVG Precision Overlays */}
+            {/* Clean SVG Bounding Overlays */}
             {showOverlays && (
               <svg 
                 className="absolute inset-0 w-full h-full" 
@@ -147,12 +140,12 @@ export const SonarViewer: React.FC<SonarViewerProps> = ({
                   const [x1, y1, x2, y2] = det.bbox;
                   const isSelected = det.id === selectedDetectionId;
                   const isHovered = det.id === hoveredDetId;
-                  const style = getRiskDetails(det.risk_level);
+                  const style = getRiskStyle(det.risk_level);
                   
-                  const strokeWidth = isSelected ? 2.5 : (isHovered ? 2 : 1.5);
+                  const strokeWidth = isSelected ? 3 : (isHovered ? 2.5 : 2);
                   const w = Math.max(10, x2 - x1);
                   const h = Math.max(10, y2 - y1);
-                  const label = det.class_name ? det.class_name.replace(/_/g, ' ') : 'Marine Anomaly';
+                  const label = det.class_name ? det.class_name.replace(/_/g, ' ') : 'Marine Object';
                   const confPercent = Math.round(det.confidence * 100);
 
                   return (
@@ -162,93 +155,44 @@ export const SonarViewer: React.FC<SonarViewerProps> = ({
                       onClick={() => onDetectionSelect?.(det.id)}
                       onMouseEnter={() => setHoveredDetId(det.id)}
                       onMouseLeave={() => setHoveredDetId(null)}
-                      className="transition-all duration-150"
+                      className="transition-all duration-200"
                     >
-                      {/* Bounding Box Area */}
+                      {/* Bounding Area */}
                       <rect
                         x={x1}
                         y={y1}
                         width={w}
                         height={h}
-                        fill={isSelected ? style.fill.replace('0.15', '0.35') : style.fill}
+                        fill={isSelected ? style.fill.replace('0.12', '0.28') : style.fill}
                         stroke={style.stroke}
                         strokeWidth={strokeWidth}
-                        strokeDasharray={isSelected ? undefined : "6 3"}
+                        rx="4"
                         className="transition-all duration-200"
                       />
-                      
-                      {/* Technical Corner Brackets */}
-                      <path
-                        d={`M ${x1} ${y1 + 8} L ${x1} ${y1} L ${x1 + 8} ${y1}`}
-                        fill="none"
-                        stroke={style.stroke}
-                        strokeWidth="2.5"
-                      />
-                      <path
-                        d={`M ${x2 - 8} ${y1} L ${x2} ${y1} L ${x2} ${y1 + 8}`}
-                        fill="none"
-                        stroke={style.stroke}
-                        strokeWidth="2.5"
-                      />
-                      <path
-                        d={`M ${x1} ${y2 - 8} L ${x1} ${y2} L ${x1 + 8} ${y2}`}
-                        fill="none"
-                        stroke={style.stroke}
-                        strokeWidth="2.5"
-                      />
-                      <path
-                        d={`M ${x2 - 8} ${y2} L ${x2} ${y2} L ${x2 - 8} ${y2}`}
-                        fill="none"
-                        stroke={style.stroke}
-                        strokeWidth="2.5"
-                      />
 
-                      {/* Tactical Target Center Cross */}
-                      {(isSelected || isHovered) && (
-                        <g opacity="0.8">
-                          <line 
-                            x1={x1 + w / 2 - 6} 
-                            y1={y1 + h / 2} 
-                            x2={x1 + w / 2 + 6} 
-                            y2={y1 + h / 2} 
-                            stroke={style.stroke} 
-                            strokeWidth="1.5" 
-                          />
-                          <line 
-                            x1={x1 + w / 2} 
-                            y1={y1 + h / 2 - 6} 
-                            x2={x1 + w / 2} 
-                            y2={y1 + h / 2 + 6} 
-                            stroke={style.stroke} 
-                            strokeWidth="1.5" 
-                          />
-                        </g>
-                      )}
-                      
-                      {/* Compact Technical Label Badge */}
-                      <g transform={`translate(${x1}, ${Math.max(20, y1 - 6)})`}>
+                      {/* Clean Floating Tag Badge */}
+                      <g transform={`translate(${x1}, ${Math.max(22, y1 - 8)})`}>
                         <rect
                           x="0"
-                          y="-16"
-                          width={Math.max(110, label.length * 7 + 42)}
-                          height="18"
-                          fill="#091B1F"
+                          y="-18"
+                          width={Math.max(120, label.length * 7.5 + 40)}
+                          height="22"
+                          fill="#FFFFFF"
                           stroke={style.stroke}
-                          strokeWidth="1"
-                          rx="2"
-                          opacity="0.95"
+                          strokeWidth="1.5"
+                          rx="6"
+                          filter="drop-shadow(0 2px 4px rgba(0,0,0,0.15))"
                         />
-                        <circle cx="8" cy="-7" r="3" fill={style.stroke} />
+                        <circle cx="9" cy="-7" r="3.5" fill={style.stroke} />
                         <text
-                          x="16"
+                          x="18"
                           y="-4"
-                          fill="#F4F8F8"
-                          fontSize="9.5"
+                          fill="#163F47"
+                          fontSize="10"
                           fontWeight="600"
-                          fontFamily="monospace"
-                          letterSpacing="0.05em"
+                          fontFamily="sans-serif"
                         >
-                          {label.substring(0, 18).toUpperCase()} {confPercent}%
+                          {label.substring(0, 20)} ({confPercent}%)
                         </text>
                       </g>
                     </g>
@@ -258,24 +202,26 @@ export const SonarViewer: React.FC<SonarViewerProps> = ({
             )}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-marineText-dim p-8">
-            <Crosshair className="w-12 h-12 mb-3 text-ocean-700 animate-pulse" />
-            <div className="text-xs font-mono tracking-widest text-marineText-muted uppercase">Awaiting Acoustic Return</div>
-            <div className="text-[10px] font-mono text-marineText-dim mt-1">NO ACTIVE TRANSDUCER SIGNALS</div>
+          <div className="flex flex-col items-center justify-center text-slate-400 p-8">
+            <div className="w-12 h-12 rounded-2xl bg-slate-800/80 flex items-center justify-center mb-3 text-slate-300">
+              <ImageIcon className="w-6 h-6" />
+            </div>
+            <div className="text-sm font-medium text-slate-300">No Sonar Frame Loaded</div>
+            <div className="text-xs text-slate-500 mt-1">Select a frame from the survey timeline below</div>
           </div>
         )}
       </div>
 
-      {/* Bottom Telemetry Bar */}
-      <div className="px-4 py-2 bg-marine-950/90 border-t border-white/[0.08] flex items-center justify-between text-[10px] font-mono text-marineText-dim shrink-0">
+      {/* Clean Bottom Metadata Bar */}
+      <div className="px-5 py-2.5 bg-white border-t border-ocean-border flex items-center justify-between text-xs text-ocean-muted shrink-0">
         <div className="flex items-center gap-4">
-          <span>SAMPLE RATE: 15.6 kHz</span>
-          <span className="hidden sm:inline">GAIN: +3.2 dB (TVG)</span>
-          <span className="hidden md:inline">RESOLUTION: 640x640 px</span>
+          <span>Swath Width: <strong className="text-ocean-dark font-medium">100m</strong></span>
+          <span className="hidden sm:inline">Resolution: <strong className="text-ocean-dark font-medium">640×640 px</strong></span>
+          <span className="hidden md:inline">Frequency: <strong className="text-ocean-dark font-medium">450 kHz</strong></span>
         </div>
-        <div className="flex items-center gap-2 text-cyan-muted">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-          <span>CALIBRATED</span>
+        <div className="flex items-center gap-1.5 text-ocean-accent font-medium">
+          <span className="w-2 h-2 rounded-full bg-alert-success" />
+          <span>Sonar Active</span>
         </div>
       </div>
     </div>

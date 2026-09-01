@@ -2,17 +2,15 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Play, 
-  Activity, 
-  AlertTriangle, 
-  Target, 
-  Database, 
-  RefreshCw,
-  ArrowUpRight,
-  ShieldCheck,
-  Cpu,
-  Waves,
-  Crosshair,
-  Radio
+  RefreshCw, 
+  ArrowRight, 
+  ShieldAlert, 
+  CheckCircle2, 
+  Sparkles,
+  Layers,
+  Search,
+  Anchor,
+  Compass
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -28,8 +26,8 @@ export default function Dashboard() {
     try {
       const response = await axios.get(`${API_URL}/analytics/mission/1`);
       setStats(response.data);
-    } catch (error) {
-      console.warn("Backend not accessible, utilizing telemetry fallback data");
+    } catch {
+      // Graceful fallback for offline demo preview
       setStats({
         total_detections: 42,
         class_distribution: {
@@ -64,18 +62,15 @@ export default function Dashboard() {
     setTimeout(() => {
       setProcessingTriggered(false);
       fetchStats();
-    }, 1500);
+    }, 1200);
   };
 
   if (loading) {
     return (
-      <div className="p-12 flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <div className="relative flex items-center justify-center">
-          <Activity className="w-8 h-8 text-cyan-400 animate-spin" />
-          <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-md" />
-        </div>
-        <span className="text-xs font-mono tracking-widest text-marineText-muted uppercase">
-          INTERROGATING ACOUSTIC TELEMETRY...
+      <div className="py-20 flex flex-col items-center justify-center gap-3">
+        <div className="w-10 h-10 rounded-full border-2 border-ocean-light border-t-ocean-accent animate-spin" />
+        <span className="text-sm font-medium text-ocean-muted">
+          Loading ocean survey telemetry...
         </span>
       </div>
     );
@@ -87,158 +82,168 @@ export default function Dashboard() {
     : 0;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-8 animate-fadeIn">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
       
-      {/* Cinematic Hero Section */}
-      <section className="relative overflow-hidden rounded-sm border border-white/[0.08] bg-gradient-to-r from-marine-950 via-marine-900 to-surface-900/60 p-8 md:p-10 shadow-2xl">
+      {/* Human & Oceanic Hero Section */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white via-ocean-surface/60 to-ocean-soft/50 border border-ocean-border p-8 sm:p-12 shadow-card">
         
-        {/* Subtle Sonar Radial Accent */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-ocean-800/20 blur-3xl pointer-events-none" />
-        <div className="absolute right-12 top-1/2 -translate-y-1/2 opacity-10 pointer-events-none hidden md:block">
-          <Radio className="w-64 h-64 text-cyan-400" />
+        {/* Decorative Wave Background SVG */}
+        <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-30 pointer-events-none hidden md:block overflow-hidden">
+          <svg className="w-full h-full text-ocean-light" viewBox="0 0 500 500" preserveAspectRatio="none" fill="currentColor">
+            <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" opacity="0.4"></path>
+            <path d="M0,200 C180,300 320,120 500,220 L500,500 L0,500 Z" opacity="0.6"></path>
+          </svg>
         </div>
 
-        <div className="relative z-10 max-w-3xl space-y-4">
+        <div className="relative z-10 max-w-2xl space-y-5">
           
-          <div className="flex items-center gap-2.5">
-            <span className="px-2.5 py-1 text-[10px] font-mono tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-sm">
-              ● MISSION ACTIVE
-            </span>
-            <span className="text-[11px] font-mono text-cyan-muted">
-              SURVEY ID: OPN-TRITON-26
-            </span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 border border-ocean-border text-xs text-ocean-dark font-medium shadow-soft">
+            <span className="w-2 h-2 rounded-full bg-alert-success animate-pulse" />
+            <span>Active Environmental Survey · Mission OPN-TRITON-26</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-tight text-marineText-primary font-sans leading-none">
-            SEE BENEATH <br/>
-            <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-cyan-400 to-ocean-600">
-              THE SURFACE.
-            </span>
+          <h1 className="text-4xl sm:text-5xl font-light text-ocean-dark tracking-tight leading-[1.15]">
+            See what lies <br />
+            <span className="font-semibold text-ocean-accent">beneath the surface.</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-marineText-secondary max-w-xl font-sans font-light leading-relaxed">
-            Automated underwater marine debris isolation and anomaly identification using high-resolution side-scan sonar imagery with physics-aware evidence fusion.
+          <p className="text-base sm:text-lg text-ocean-muted font-normal leading-relaxed">
+            Eye of Poseidon uses side-scan sonar intelligence to detect, classify, and monitor marine debris across fragile underwater ecosystems.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-3">
             <Link 
               to="/survey" 
-              className="marine-btn-primary py-2 px-5 text-xs font-mono font-medium tracking-wider shadow-lg"
+              className="ocean-btn-primary py-2.5 px-6 rounded-xl font-medium shadow-card text-sm"
             >
-              <Crosshair className="w-3.5 h-3.5" />
-              <span>EXPLORE ACOUSTIC SWATH</span>
-              <ArrowUpRight className="w-3 h-3 text-cyan-300" />
+              <span>Explore Sonar Feed</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
 
             <button 
               onClick={runDemoMission}
               disabled={processingTriggered}
-              className="marine-btn py-2 px-4 text-xs font-mono tracking-wider"
+              className="ocean-btn-secondary py-2.5 px-5 rounded-xl text-sm"
             >
               {processingTriggered ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-cyan-400" />
-                  <span>SYNCHRONIZING...</span>
+                  <RefreshCw className="w-4 h-4 animate-spin text-ocean-accent" />
+                  <span>Processing Frames...</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>START PIPELINE INFERENCE</span>
+                  <Play className="w-4 h-4 text-ocean-accent" />
+                  <span>Run Detection Pipeline</span>
                 </>
               )}
             </button>
 
             <button 
               onClick={fetchStats}
-              className="p-2 text-marineText-muted hover:text-cyan-300 bg-surface-900/60 hover:bg-surface-800 border border-white/[0.08] rounded-sm transition-colors"
-              title="Refresh telemetry"
+              className="p-2.5 text-ocean-muted hover:text-ocean-dark bg-white hover:bg-ocean-surface border border-ocean-border rounded-xl transition-colors shadow-soft"
+              title="Refresh data"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="w-4 h-4" />
             </button>
           </div>
 
         </div>
 
-        {/* Hero Bottom Telemetry Line */}
-        <div className="mt-8 pt-4 border-t border-white/[0.06] grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
+        {/* Human telemetry footer */}
+        <div className="mt-10 pt-6 border-t border-ocean-border/70 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
           <div>
-            <div className="text-marineText-dim text-[9px] uppercase tracking-wider">AUV Platform</div>
-            <div className="text-marineText-primary font-medium">Poseidon-X4 Hydroid</div>
+            <div className="text-ocean-muted text-[11px] mb-0.5">Survey Vehicle</div>
+            <div className="font-medium text-ocean-dark">AUV Triton-01</div>
           </div>
           <div>
-            <div className="text-marineText-dim text-[9px] uppercase tracking-wider">Transducer Freq</div>
-            <div className="text-marineText-primary font-medium">450 / 900 kHz Dual</div>
+            <div className="text-ocean-muted text-[11px] mb-0.5">Water Depth</div>
+            <div className="font-medium text-ocean-dark">45.8 meters</div>
           </div>
           <div>
-            <div className="text-marineText-dim text-[9px] uppercase tracking-wider">Bathymetric Depth</div>
-            <div className="text-marineText-primary font-medium">45.8 m (Nominal)</div>
+            <div className="text-ocean-muted text-[11px] mb-0.5">Transducer Frequency</div>
+            <div className="font-medium text-ocean-dark">450 kHz Clean Acoustic</div>
           </div>
           <div>
-            <div className="text-marineText-dim text-[9px] uppercase tracking-wider">Fusion Mode</div>
-            <div className="text-cyan-300 font-medium">Physics + YOLOv8</div>
+            <div className="text-ocean-muted text-[11px] mb-0.5">Detection Model</div>
+            <div className="font-medium text-ocean-accent">Physics + YOLOv8</div>
           </div>
         </div>
 
       </section>
 
-      {/* Scientific KPI Metrics Grid */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Overview Metric Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        {/* Total Isolated Anomalies */}
-        <div className="marine-card p-5 border-l-2 border-l-cyan-400 relative overflow-hidden group">
-          <div className="flex items-center justify-between text-marineText-muted mb-3">
-            <span className="marine-label">TOTAL ANOMALIES</span>
-            <Target className="w-4 h-4 text-cyan-400" />
+        {/* Total Debris Isolated */}
+        <div className="ocean-card p-6 relative overflow-hidden group hover:border-ocean-accent/40">
+          <div className="flex items-center justify-between text-ocean-muted mb-3">
+            <span className="text-xs font-medium uppercase tracking-wider text-ocean-muted">
+              Total Objects Found
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-ocean-soft/70 flex items-center justify-center text-ocean-accent">
+              <Search className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-3xl font-mono font-bold tracking-tight text-marineText-primary">
+          <div className="text-3xl font-semibold text-ocean-dark tracking-tight">
             {stats?.total_detections || 0}
           </div>
-          <div className="text-[11px] font-mono text-cyan-muted/80 mt-2 flex items-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-cyan-400"></span>
-            <span>Acoustic bounding targets</span>
+          <div className="text-xs text-ocean-muted mt-2">
+            Identified across acoustic swaths
           </div>
         </div>
 
-        {/* Critical Risk Targets */}
-        <div className="marine-card p-5 border-l-2 border-l-alert-critical relative overflow-hidden group">
-          <div className="flex items-center justify-between text-marineText-muted mb-3">
-            <span className="marine-label">CRITICAL HAZARDS</span>
-            <AlertTriangle className="w-4 h-4 text-alert-critical" />
+        {/* Critical Risk */}
+        <div className="ocean-card p-6 relative overflow-hidden group hover:border-alert-critical/40">
+          <div className="flex items-center justify-between text-ocean-muted mb-3">
+            <span className="text-xs font-medium uppercase tracking-wider text-ocean-muted">
+              Critical Hazards
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-alert-critical">
+              <ShieldAlert className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-3xl font-mono font-bold tracking-tight text-alert-critical">
+          <div className="text-3xl font-semibold text-alert-critical tracking-tight">
             {stats?.risk_distribution?.CRITICAL || 0}
           </div>
-          <div className="text-[11px] font-mono text-marineText-dim mt-2">
-            Requires immediate ROV inspection
+          <div className="text-xs text-ocean-muted mt-2">
+            High priority for marine inspection
           </div>
         </div>
 
-        {/* High Risk Targets */}
-        <div className="marine-card p-5 border-l-2 border-l-alert-high relative overflow-hidden group">
-          <div className="flex items-center justify-between text-marineText-muted mb-3">
-            <span className="marine-label">HIGH RISK DEBRIS</span>
-            <ShieldCheck className="w-4 h-4 text-alert-high" />
+        {/* High Risk */}
+        <div className="ocean-card p-6 relative overflow-hidden group hover:border-alert-high/40">
+          <div className="flex items-center justify-between text-ocean-muted mb-3">
+            <span className="text-xs font-medium uppercase tracking-wider text-ocean-muted">
+              High Risk Debris
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-alert-high">
+              <Anchor className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-3xl font-mono font-bold tracking-tight text-alert-high">
+          <div className="text-3xl font-semibold text-alert-high tracking-tight">
             {stats?.risk_distribution?.HIGH || 0}
           </div>
-          <div className="text-[11px] font-mono text-marineText-dim mt-2">
-            Priority navigation hazard
+          <div className="text-xs text-ocean-muted mt-2">
+            Marked for ecological survey
           </div>
         </div>
 
-        {/* Operator Verification Progress */}
-        <div className="marine-card p-5 border-l-2 border-l-emerald-400 relative overflow-hidden group">
-          <div className="flex items-center justify-between text-marineText-muted mb-3">
-            <span className="marine-label">REVIEW PROGRESS</span>
-            <Activity className="w-4 h-4 text-emerald-400" />
+        {/* Verification Progress */}
+        <div className="ocean-card p-6 relative overflow-hidden group hover:border-alert-success/40">
+          <div className="flex items-center justify-between text-ocean-muted mb-3">
+            <span className="text-xs font-medium uppercase tracking-wider text-ocean-muted">
+              Verified by Team
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-alert-success">
+              <CheckCircle2 className="w-4 h-4" />
+            </div>
           </div>
-          <div className="text-3xl font-mono font-bold tracking-tight text-marineText-primary">
+          <div className="text-3xl font-semibold text-ocean-dark tracking-tight">
             {reviewProgress}%
           </div>
-          <div className="w-full h-1 bg-marine-950 rounded-full mt-2.5 overflow-hidden">
+          <div className="w-full h-1.5 bg-ocean-surface rounded-full mt-3 overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all duration-500" 
+              className="h-full bg-gradient-to-r from-ocean-medium to-alert-success rounded-full transition-all duration-500" 
               style={{ width: `${reviewProgress}%` }} 
             />
           </div>
@@ -246,23 +251,23 @@ export default function Dashboard() {
 
       </section>
 
-      {/* Main Analytical Section */}
+      {/* Main Analytical Content Grid */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Class Distribution Breakdown */}
-        <div className="marine-card lg:col-span-2 p-6 border border-white/[0.08] space-y-6">
-          <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+        {/* Object Categorization */}
+        <div className="ocean-card lg:col-span-2 p-6 sm:p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-ocean-border/60 pb-4">
             <div>
-              <h2 className="text-sm font-semibold tracking-wider text-marineText-primary uppercase font-mono">
-                Acoustic Object Classification
+              <h2 className="text-base font-semibold text-ocean-dark">
+                Acoustic Object Classifications
               </h2>
-              <p className="text-xs text-marineText-dim font-sans">
-                Distribution of detected underwater debris, cables, and wrecks
+              <p className="text-xs text-ocean-muted mt-0.5">
+                Types of marine debris, cables, and structural anomalies detected
               </p>
             </div>
-            <span className="text-[10px] font-mono text-cyan-muted bg-surface-900/60 px-2 py-1 rounded-sm border border-white/[0.05]">
-              YOLOv8-SEABED
-            </span>
+            <div className="text-xs font-medium text-ocean-accent bg-ocean-surface px-3 py-1 rounded-full border border-ocean-border">
+              Survey Analysis
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -274,13 +279,13 @@ export default function Dashboard() {
                 
                 return (
                   <div key={className} className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-mono">
-                      <span className="text-marineText-secondary capitalize font-sans">{readableName}</span>
-                      <span className="text-cyan-300 font-semibold">{count} <span className="text-marineText-dim font-normal">({percentage}%)</span></span>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-ocean-dark font-medium capitalize">{readableName}</span>
+                      <span className="text-ocean-muted font-medium">{count} objects ({percentage}%)</span>
                     </div>
-                    <div className="w-full h-1.5 bg-marine-950 rounded-full overflow-hidden border border-white/[0.04]">
+                    <div className="w-full h-2 bg-ocean-surface rounded-full overflow-hidden border border-ocean-border/50">
                       <div 
-                        className="h-full bg-gradient-to-r from-ocean-700 via-cyan-500 to-cyan-300 rounded-full transition-all duration-500" 
+                        className="h-full bg-gradient-to-r from-ocean-light to-ocean-accent rounded-full transition-all duration-500" 
                         style={{ width: `${percentage}%` }} 
                       />
                     </div>
@@ -289,62 +294,60 @@ export default function Dashboard() {
               })}
           </div>
 
-          <div className="p-3 bg-surface-900/40 border border-white/[0.05] rounded-sm flex items-center justify-between text-xs font-mono">
-            <span className="text-marineText-dim">VERIFIED: {stats?.review_status?.verified || 0}</span>
-            <span className="text-marineText-dim">REJECTED: {stats?.review_status?.rejected || 0}</span>
-            <span className="text-cyan-300 font-medium">PENDING AUDIT: {stats?.review_status?.pending || 0}</span>
+          <div className="p-4 bg-ocean-surface/60 border border-ocean-border rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs text-ocean-muted">
+            <span>Verified: <strong className="text-ocean-dark">{stats?.review_status?.verified || 0}</strong></span>
+            <span>Dismissed: <strong className="text-ocean-dark">{stats?.review_status?.rejected || 0}</strong></span>
+            <span>Awaiting Review: <strong className="text-ocean-accent">{stats?.review_status?.pending || 0}</strong></span>
           </div>
         </div>
 
-        {/* System Architecture & Evidence Weights */}
-        <div className="marine-card p-6 border border-white/[0.08] flex flex-col justify-between space-y-6">
-          
+        {/* Environmental System Status */}
+        <div className="ocean-card p-6 sm:p-8 flex flex-col justify-between space-y-6">
           <div>
-            <div className="border-b border-white/[0.06] pb-3 mb-4">
-              <h2 className="text-sm font-semibold tracking-wider text-marineText-primary uppercase font-mono">
-                Telemetry & Architecture
+            <div className="border-b border-ocean-border/60 pb-4 mb-5">
+              <h2 className="text-base font-semibold text-ocean-dark">
+                Mission System Health
               </h2>
-              <p className="text-xs text-marineText-dim font-sans">
-                Subsea pipeline engine status
+              <p className="text-xs text-ocean-muted mt-0.5">
+                Underwater intelligence pipeline status
               </p>
             </div>
 
-            <div className="space-y-3.5">
+            <div className="space-y-4">
               
-              <div className="flex items-center gap-3 p-2.5 bg-surface-900/50 border border-white/[0.05] rounded-sm">
-                <div className="p-2 bg-marine-900 rounded-sm text-cyan-400 border border-white/[0.06]">
-                  <Cpu className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-3 bg-ocean-surface/60 rounded-xl border border-ocean-border/60">
+                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-ocean-accent shadow-soft">
+                  <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono text-marineText-dim uppercase">Inference Engine</div>
-                  <div className="text-xs font-mono text-emerald-400 font-medium flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    ONLINE (FastAPI / YOLO)
+                  <div className="text-xs font-medium text-ocean-dark">AI Detection Engine</div>
+                  <div className="text-[11px] text-alert-success font-medium flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-alert-success" />
+                    Online and Analyzing
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-2.5 bg-surface-900/50 border border-white/[0.05] rounded-sm">
-                <div className="p-2 bg-marine-900 rounded-sm text-cyan-400 border border-white/[0.06]">
-                  <Database className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-3 bg-ocean-surface/60 rounded-xl border border-ocean-border/60">
+                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-ocean-accent shadow-soft">
+                  <Layers className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono text-marineText-dim uppercase">Acoustic Repository</div>
-                  <div className="text-xs font-mono text-emerald-400 font-medium flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    CONNECTED (SQLite / Async)
+                  <div className="text-xs font-medium text-ocean-dark">Evidence Fusion Profile</div>
+                  <div className="text-[11px] text-ocean-muted">
+                    AI: 50% · Shadow: 25% · Shape: 15% · Terrain: 10%
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-2.5 bg-surface-900/50 border border-white/[0.05] rounded-sm">
-                <div className="p-2 bg-marine-900 rounded-sm text-cyan-400 border border-white/[0.06]">
-                  <Waves className="w-4 h-4" />
+              <div className="flex items-center gap-3 p-3 bg-ocean-surface/60 rounded-xl border border-ocean-border/60">
+                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-ocean-accent shadow-soft">
+                  <Compass className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-[10px] font-mono text-marineText-dim uppercase">Evidence Fusion Profile</div>
-                  <div className="text-[11px] font-mono text-marineText-secondary mt-0.5">
-                    AI:50% · SHD:25% · SHP:15% · TRN:10%
+                  <div className="text-xs font-medium text-ocean-dark">Hydrographic Georeference</div>
+                  <div className="text-[11px] text-ocean-muted">
+                    WGS-84 Grid Calibrated
                   </div>
                 </div>
               </div>
@@ -352,10 +355,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="p-3 bg-ocean-900/30 border border-cyan-500/20 rounded-sm text-[11px] font-mono text-cyan-muted/90">
-            <span className="font-semibold text-cyan-300">NOTE:</span> Prototype operational in demo telemetry mode. Coordinates aligned to bathymetric survey baseline.
+          <div className="p-4 bg-ocean-soft/40 border border-ocean-border rounded-xl text-xs text-ocean-dark/80 leading-relaxed">
+            <span className="font-semibold text-ocean-accent">Environmental Note:</span> Real-time automated alerts help prioritize cleanup efforts for marine conservation.
           </div>
-
         </div>
 
       </section>
