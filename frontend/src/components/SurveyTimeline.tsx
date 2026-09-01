@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, FastForward, SkipBack, Target } from 'lucide-react';
+import { Play, Pause, FastForward, SkipBack, Radio } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 interface Frame {
@@ -34,105 +34,141 @@ export const SurveyTimeline: React.FC<TimelineProps> = ({
       if (currentFrameIndex < frames.length - 1) {
         onFrameChange(currentFrameIndex + 1);
       } else {
-        setIsPlaying(false); // Stop at end
+        setIsPlaying(false);
       }
-    }, 1000); // 1 frame per second for demo
+    }, 900);
     
     return () => clearInterval(timer);
   }, [isPlaying, currentFrameIndex, frames.length, onFrameChange]);
 
   const togglePlay = () => setIsPlaying(!isPlaying);
 
+  const currentFrame = frames[currentFrameIndex];
+  const processedCount = frames.filter(f => f.processing_status === 'completed').length;
+  const coveragePercent = frames.length > 0 ? Math.round((processedCount / frames.length) * 100) : 0;
+
   return (
-    <div className={cn("console-card flex flex-col", className)}>
-      <div className="p-3 border-b border-navy-700 bg-navy-800/80 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-300">SURVEY TIMELINE</h3>
-        <div className="flex gap-2">
+    <div className={cn("marine-card flex flex-col justify-between p-3 border border-white/[0.08] bg-marine-950/80 backdrop-blur-md select-none", className)}>
+      
+      {/* Top Scrubber Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span className="text-[10px] font-mono tracking-ultra text-marineText-muted uppercase">
+              SURVEY SCRUBBER
+            </span>
+          </div>
+          <span className="text-white/10 text-xs">|</span>
+          <span className="text-[10px] font-mono text-cyan-muted">
+            FRAME {currentFrameIndex + 1} OF {Math.max(1, frames.length)}
+          </span>
+        </div>
+
+        {/* Transport Controls */}
+        <div className="flex items-center gap-1.5 bg-surface-900/80 px-2 py-1 rounded-sm border border-white/[0.06]">
           <button 
-            className="p-1 text-gray-400 hover:text-cyan-400 transition-colors"
+            className="p-1 text-marineText-muted hover:text-cyan-300 transition-colors disabled:opacity-30"
             onClick={() => onFrameChange(0)}
             disabled={currentFrameIndex === 0}
+            title="Return to Start"
           >
-            <SkipBack className="w-4 h-4" />
+            <SkipBack className="w-3.5 h-3.5" />
           </button>
+          
           <button 
             className={cn(
-              "p-1 transition-colors",
-              isPlaying ? "text-amber-400" : "text-gray-400 hover:text-cyan-400"
+              "px-2 py-0.5 rounded-sm text-xs font-mono transition-all flex items-center gap-1",
+              isPlaying 
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
+                : "bg-ocean-800/80 text-cyan-300 border border-cyan-400/30 hover:bg-ocean-700"
             )}
             onClick={togglePlay}
           >
-            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            {isPlaying ? (
+              <>
+                <Pause className="w-3 h-3" />
+                <span className="text-[10px]">PAUSE</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-3 h-3" />
+                <span className="text-[10px]">PLAY</span>
+              </>
+            )}
           </button>
+
           <button 
-            className="p-1 text-gray-400 hover:text-cyan-400 transition-colors"
+            className="p-1 text-marineText-muted hover:text-cyan-300 transition-colors disabled:opacity-30"
             onClick={() => onFrameChange(Math.min(frames.length - 1, currentFrameIndex + 5))}
+            disabled={currentFrameIndex >= frames.length - 1}
+            title="Step Forward 5 Frames"
           >
-            <FastForward className="w-4 h-4" />
+            <FastForward className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
       
-      <div className="p-4 flex-1">
-        <div className="relative h-12 flex items-center">
-          {/* Main track */}
-          <div className="absolute left-0 right-0 h-2 bg-navy-900 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-navy-600 transition-all duration-300"
-              style={{ width: `${(frames.filter(f => f.processing_status === 'completed').length / Math.max(1, frames.length)) * 100}%` }}
-            />
-          </div>
-          
-          {/* Playhead line (behind markers) */}
+      {/* Interactive Timeline Track */}
+      <div className="relative h-7 flex items-center px-1">
+        
+        {/* Background Track */}
+        <div className="absolute left-0 right-0 h-1.5 bg-marine-900 rounded-sm overflow-hidden border border-white/[0.05]">
           <div 
-            className="absolute top-0 bottom-0 w-0.5 bg-cyan-500/50 shadow-[0_0_8px_rgba(34,211,238,0.5)] transition-all duration-300 pointer-events-none z-0"
-            style={{ left: `${(currentFrameIndex / Math.max(1, frames.length - 1)) * 100}%` }}
+            className="h-full bg-ocean-800/70 transition-all duration-300"
+            style={{ width: `${coveragePercent}%` }}
           />
-          
-          {/* Markers */}
-          <div className="absolute inset-0 flex items-center z-10">
-            {frames.map((frame, idx) => {
-              const detCount = detectionsByFrame[frame.id] || 0;
-              const hasDetections = detCount > 0;
-              const isCurrent = idx === currentFrameIndex;
-              const isProcessed = frame.processing_status === 'completed';
-              
-              // Calculate position percentage
-              const pos = (idx / Math.max(1, frames.length - 1)) * 100;
-              
-              // Only render markers for detections or current frame to avoid DOM overload
-              if (!hasDetections && !isCurrent && idx % 10 !== 0) return null;
-              
-              return (
-                <button
-                  key={frame.id}
-                  className={cn(
-                    "absolute w-3 h-3 -ml-1.5 rounded-full transition-all duration-200",
-                    isCurrent ? "scale-150 bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] z-20" :
-                    hasDetections ? "bg-alert-critical z-10 hover:scale-125 shadow-[0_0_5px_rgba(239,68,68,0.5)]" :
-                    isProcessed ? "bg-navy-500 w-2 h-2 -ml-1" : "bg-navy-700 w-2 h-2 -ml-1"
-                  )}
-                  style={{ left: `${pos}%` }}
-                  onClick={() => onFrameChange(idx)}
-                  title={`Frame: ${frame.frame_identifier}${hasDetections ? ` (${detCount} anomalies)` : ''}`}
-                >
-                  {hasDetections && isCurrent && (
-                    <Target className="absolute -top-6 -left-1.5 w-4 h-4 text-alert-critical animate-pulse" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
         </div>
         
-        <div className="flex justify-between text-xs text-gray-500 mt-2 font-mono">
-          <span>00:00:00</span>
-          <span className="text-cyan-400">
-            FRAME {frames[currentFrameIndex]?.id.toString().padStart(4, '0') || '0000'}
-          </span>
-          <span>End of Survey</span>
+        {/* Playhead Glowing Line */}
+        <div 
+          className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 shadow-[0_0_8px_#42D7E8] transition-all duration-150 pointer-events-none z-20"
+          style={{ left: `${frames.length > 1 ? (currentFrameIndex / (frames.length - 1)) * 100 : 0}%` }}
+        />
+        
+        {/* Anomaly Ping Markers */}
+        <div className="absolute inset-0 flex items-center z-10 pointer-events-auto">
+          {frames.map((frame, idx) => {
+            const detCount = detectionsByFrame[frame.id] || 0;
+            const hasDetections = detCount > 0;
+            const isCurrent = idx === currentFrameIndex;
+            const pos = frames.length > 1 ? (idx / (frames.length - 1)) * 100 : 0;
+            
+            // Limit render count for performance
+            if (!hasDetections && !isCurrent && idx % 4 !== 0) return null;
+            
+            return (
+              <button
+                key={frame.id}
+                className={cn(
+                  "absolute -translate-x-1/2 rounded-full transition-all duration-150 focus:outline-none",
+                  isCurrent 
+                    ? "w-3 h-3 bg-cyan-300 ring-2 ring-cyan-400/50 shadow-[0_0_12px_#42D7E8] z-30" 
+                    : hasDetections 
+                      ? "w-2.5 h-2.5 bg-alert-high hover:scale-150 ring-1 ring-alert-high/60 shadow-[0_0_6px_#FB923C] z-20" 
+                      : "w-1 h-1 bg-surface-700 hover:bg-marineText-muted z-10"
+                )}
+                style={{ left: `${pos}%` }}
+                onClick={() => onFrameChange(idx)}
+                title={`Frame ${frame.id}: ${frame.frame_identifier}${hasDetections ? ` (${detCount} target${detCount > 1 ? 's' : ''})` : ''}`}
+              />
+            );
+          })}
         </div>
       </div>
+      
+      {/* Bottom Metadata & Coverage Bar */}
+      <div className="flex items-center justify-between text-[10px] font-mono text-marineText-dim pt-1 border-t border-white/[0.04]">
+        <div className="flex items-center gap-3">
+          <span>SWATH: <span className="text-marineText-secondary">{currentFrame?.frame_identifier || 'SWATH_0001'}</span></span>
+          <span className="hidden sm:inline text-white/10">|</span>
+          <span className="hidden sm:inline">PROCESSING: <span className="text-emerald-400">{coveragePercent}% COMPLETE</span></span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>SURVEY DURATION: <span className="text-marineText-secondary">00:42:15</span></span>
+        </div>
+      </div>
+
     </div>
   );
 };

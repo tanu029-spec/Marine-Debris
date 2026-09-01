@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SonarViewer } from '../components/SonarViewer';
 import { AnomalyDetailPanel } from '../components/AnomalyDetailPanel';
 import { SurveyTimeline } from '../components/SurveyTimeline';
@@ -36,13 +36,12 @@ export default function SurveyView() {
     };
     
     // Check if backend is up before trying to fetch
-    axios.get('http://localhost:8000/api/health')
+    axios.get(`${API_URL}/health`)
       .then(() => fetchFrames())
       .catch(() => {
-        console.warn("Backend not running, using dummy data");
-        // Create some dummy frames for UI development
-        const dummyFrames = Array.from({length: 50}).map((_, i) => ({
-          id: i+1,
+        console.warn("Backend not active, instantiating acoustic telemetry fallback frames");
+        const dummyFrames = Array.from({length: 40}).map((_, i) => ({
+          id: i + 1,
           frame_identifier: `sonar_swath_${i.toString().padStart(4, '0')}.jpg`,
           processing_status: 'completed',
           timestamp: new Date().toISOString()
@@ -68,19 +67,28 @@ export default function SurveyView() {
           setSelectedAnomalyId(null);
         }
       })
-      .catch(err => {
-        console.warn("Error fetching frame details, using dummy data");
-        // Dummy data for UI development
+      .catch(() => {
+        // Fallback dummy frame data
         const dummyData = {
           ...frames[currentFrameIndex],
-          detections: currentFrameIndex % 5 === 0 ? [
+          detections: currentFrameIndex % 4 === 0 ? [
             {
               id: currentFrameIndex * 10 + 1,
               class_name: 'shipwreck_or_large_structure',
-              confidence: { final: 0.85, model: 0.9, shadow: 0.7, shape: 0.8, terrain: 0.9 },
-              risk: { score: 75, level: 'HIGH' },
-              location: { latitude: 35.123, longitude: -120.456 },
-              bbox: [200, 150, 300, 250],
+              confidence: { final: 0.88, model: 0.92, shadow: 0.78, shape: 0.85, terrain: 0.90 },
+              risk: { score: 84, level: 'HIGH' },
+              location: { latitude: 35.1238, longitude: -120.4562 },
+              bbox: [180, 140, 360, 280],
+              status: 'pending'
+            }
+          ] : currentFrameIndex % 7 === 0 ? [
+            {
+              id: currentFrameIndex * 10 + 2,
+              class_name: 'pipe_or_cable',
+              confidence: { final: 0.74, model: 0.79, shadow: 0.65, shape: 0.70, terrain: 0.82 },
+              risk: { score: 58, level: 'MEDIUM' },
+              location: { latitude: 35.1251, longitude: -120.4569 },
+              bbox: [80, 200, 480, 260],
               status: 'pending'
             }
           ] : []
@@ -107,10 +115,9 @@ export default function SurveyView() {
         setDetectionsByFrame(counts);
       })
       .catch(() => {
-        // Dummy data: frame 0, 5, 10 have detections
         const dummyCounts: Record<number, number> = {};
         frames.forEach((f, i) => {
-          if (i % 5 === 0) dummyCounts[f.id] = 1;
+          if (i % 4 === 0 || i % 7 === 0) dummyCounts[f.id] = 1;
         });
         setDetectionsByFrame(dummyCounts);
       });
@@ -119,50 +126,76 @@ export default function SurveyView() {
   const handleVerify = async (id: number) => {
     try {
       await axios.patch(`${API_URL}/detections/${id}/review`, { status: 'verified' });
-      // Update local state
       setCurrentFrameData((prev: any) => ({
         ...prev,
         detections: prev.detections.map((d: any) => 
           d.id === id ? { ...d, status: 'verified' } : d
         )
       }));
-    } catch (e) { console.error(e); }
+    } catch {
+      console.warn("Optimistic review update (demo mode)");
+      setCurrentFrameData((prev: any) => ({
+        ...prev,
+        detections: prev.detections.map((d: any) => 
+          d.id === id ? { ...d, status: 'verified' } : d
+        )
+      }));
+    }
   };
 
   const handleReject = async (id: number) => {
     try {
       await axios.patch(`${API_URL}/detections/${id}/review`, { status: 'rejected' });
-      // Update local state
       setCurrentFrameData((prev: any) => ({
         ...prev,
         detections: prev.detections.map((d: any) => 
           d.id === id ? { ...d, status: 'rejected' } : d
         )
       }));
-    } catch (e) { console.error(e); }
+    } catch {
+      console.warn("Optimistic review update (demo mode)");
+      setCurrentFrameData((prev: any) => ({
+        ...prev,
+        detections: prev.detections.map((d: any) => 
+          d.id === id ? { ...d, status: 'rejected' } : d
+        )
+      }));
+    }
   };
 
   if (loading) {
-    return <div className="p-6 flex justify-center items-center h-full"><Activity className="w-8 h-8 text-cyan-500 animate-spin" /></div>;
+    return (
+      <div className="p-12 flex flex-col items-center justify-center h-full gap-3">
+        <div className="relative flex items-center justify-center">
+          <Activity className="w-8 h-8 text-cyan-400 animate-spin" />
+          <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-md" />
+        </div>
+        <span className="text-xs font-mono tracking-widest text-marineText-muted uppercase">
+          INITIALIZING TRANSDUCER WATERFALL APERTURE...
+        </span>
+      </div>
+    );
   }
 
   const selectedDetection = currentFrameData?.detections?.find((d: any) => d.id === selectedAnomalyId) || null;
 
-  // Paths for images (assuming they are served by the backend)
-  // Fallback to placeholders for pure frontend dev
+  // Paths for images
   const originalImageUrl = currentFrameData?.filename 
     ? `${DATA_URL}/raw/${currentFrameData.filename}`
-    : "https://placehold.co/640x640/1a1a2e/22d3ee?text=Sonar+Feed";
+    : "https://placehold.co/640x640/071417/42D7E8?text=Acoustic+Sonar+Swath";
     
   const processedImageUrl = currentFrameData?.processed_path
     ? `${DATA_URL}/processed/${currentFrameData.processed_path.split(/[\\/]/).pop()}`
-    : undefined; // Will fallback to original in SonarViewer
+    : undefined;
 
   return (
-    <div className="flex flex-col h-full p-4 gap-4">
-      {/* Top area: Viewer + Details */}
-      <div className="flex-1 flex gap-4 min-h-0">
-        <div className="flex-1 min-w-0">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] p-4 gap-3 overflow-hidden select-none">
+      
+      {/* Top Main Workspace: Sonar Viewer (dominant ~70%) + Evidence Fusion Inspector */}
+      <div className="flex-1 flex gap-3 min-h-0">
+        
+        {/* Sonar Acoustic Aperture Viewport (70% dominant) */}
+        <div className="flex-1 min-w-0 h-full">
           <SonarViewer 
             originalImage={originalImageUrl}
             processedImage={processedImageUrl}
@@ -172,17 +205,19 @@ export default function SurveyView() {
           />
         </div>
         
-        <div className="w-[350px] shrink-0">
+        {/* Evidence Fusion Telemetry Panel */}
+        <div className="w-[360px] xl:w-[400px] shrink-0 h-full">
           <AnomalyDetailPanel 
             detection={selectedDetection} 
             onVerify={handleVerify}
             onReject={handleReject}
           />
         </div>
+
       </div>
       
-      {/* Bottom area: Timeline */}
-      <div className="h-[120px] shrink-0">
+      {/* Bottom Acoustic Telemetry Timeline Scrubber */}
+      <div className="h-[105px] shrink-0">
         <SurveyTimeline 
           frames={frames}
           currentFrameIndex={currentFrameIndex}
@@ -190,6 +225,7 @@ export default function SurveyView() {
           detectionsByFrame={detectionsByFrame}
         />
       </div>
+
     </div>
   );
 }
